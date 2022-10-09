@@ -1,11 +1,27 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { authReducer } from "features/auth";
+import { PersistConfig, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+
+// all reducer names we want to persist in local storage
+const whiteList = ["auth"];
+
+const persistConfig = {
+  key: "@balance-ton-bug",
+  storage,
+  whiteList,
+};
+
+const reducers = combineReducers({
+  auth: authReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-  },
+  reducer: persistedReducer,
+  devTools: process.env.NODE_ENV !== "production",
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
